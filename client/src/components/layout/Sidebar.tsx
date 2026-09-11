@@ -57,7 +57,7 @@ export function Sidebar() {
           <Layers className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-base font-bold text-white tracking-tight">Velozity</h1>
+          <h1 className="text-base font-bold text-white tracking-tight">ProjectPulse</h1>
           <p className="text-xs text-indigo-400 font-medium">ProjectHub</p>
         </div>
       </div>
@@ -102,8 +102,9 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-800 text-xs text-gray-500 text-center">
-        Velozity v1.0.0 &bull; Agency Hub
+        ProjectPulse v1.0.0 &bull; Agency Hub
       </div>
     </aside>
   );
 }
+

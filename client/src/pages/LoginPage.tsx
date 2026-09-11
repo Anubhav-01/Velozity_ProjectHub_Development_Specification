@@ -47,7 +47,7 @@ export function LoginPage() {
           </div>
         </div>
         <h2 className="mt-4 text-center text-2xl font-bold tracking-tight text-white">
-          Velozity ProjectHub
+          ProjectPulse
         </h2>
         <p className="mt-1 text-center text-xs text-indigo-300 font-medium">
           Real-Time Agency Project Management System
@@ -203,3 +203,4 @@ export function LoginPage() {
     </div>
   );
 }
+

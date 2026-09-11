@@ -1,4 +1,4 @@
-# Velozity ProjectHub
+# ProjectPulse
 
 > **Production-Quality Real-Time Agency Project Management System**  
 > Built with React, Node.js, Express, TypeScript, PostgreSQL, Prisma ORM, and Socket.io.
@@ -15,7 +15,7 @@
 
 ## 1. Project Overview
 
-**Velozity ProjectHub** is a production-ready, real-time agency project management dashboard designed for modern digital agencies, consulting firms, and software teams. Unlike simple CRUD applications, Velozity delivers an enterprise-grade multi-tier architecture featuring **backend-enforced Role-Based Access Control (RBAC)**, **resource-level ownership authorization**, **bidirectional real-time WebSocket communication**, **database-backed audit history**, **missed activity recovery**, **background cron jobs**, and a **dual-token JWT authentication system with HttpOnly refresh cookies**.
+**ProjectPulse** is a production-ready, real-time agency project management dashboard designed for modern digital agencies, consulting firms, and software teams. Unlike simple CRUD applications, ProjectPulse delivers an enterprise-grade multi-tier architecture featuring **backend-enforced Role-Based Access Control (RBAC)**, **resource-level ownership authorization**, **bidirectional real-time WebSocket communication**, **database-backed audit history**, **missed activity recovery**, **background cron jobs**, and a **dual-token JWT authentication system with HttpOnly refresh cookies**.
 
 ---
 
@@ -70,7 +70,7 @@
 
 ## 4. Architecture & Clean Layer Separation
 
-Velozity ProjectHub enforces a strict **Controller-Service-Repository** pattern:
+ProjectPulse enforces a strict **Controller-Service-Repository** pattern:
 
 ```
 HTTP Request / WebSocket Event
@@ -250,7 +250,7 @@ In accordance with Section 4 requirements, targeted indexes were introduced to o
 
 ## 8. Authentication & Security Architecture
 
-Velozity ProjectHub implements a secure **Dual-Token JWT Architecture**:
+ProjectPulse implements a secure **Dual-Token JWT Architecture**:
 
 ```
 Client                                  Server
@@ -305,7 +305,7 @@ Even if a user sends a forged request to `/api/projects/:id` or `/api/tasks/:id/
 
 ## 10. Real-Time WebSocket Architecture
 
-Velozity ProjectHub uses **Socket.io** for persistent, bidirectional communication.
+ProjectPulse uses **Socket.io** for persistent, bidirectional communication.
 
 ### Why Socket.io was Selected
 1. **Fallback Capability**: Socket.io starts with HTTP long-polling and automatically upgrades to WebSocket, ensuring connectivity even across restrictive corporate firewalls or proxies.
@@ -596,4 +596,5 @@ The backend must run on an environment that supports persistent WebSocket connec
 
 ## 23. License
 
-MIT &copy; 2026 Velozity ProjectHub. All rights reserved.
+MIT &copy; 2026 ProjectPulse. All rights reserved.
+
