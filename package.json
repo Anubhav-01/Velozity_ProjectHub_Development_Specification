@@ -26,6 +26,9 @@
     "server",
     "client"
   ],
+  "dependencies": {
+    "typescript": "^5.3.3"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
