@@ -1,52 +1,54 @@
 version: '3.8'
 
 services:
+  # ============================================================
+  # PostgreSQL Database
+  # ============================================================
   db:
     image: postgres:15-alpine
-    container_name: inventory_db
-    restart: always
+    container_name: velozity_db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-inventory}
+      POSTGRES_USER: ${POSTGRES_USER:-velozity}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-velozity_dev_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-velozity_projecthub}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-velozity} -d ${POSTGRES_DB:-velozity_projecthub}']
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+    networks:
+      - velozity_network
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: inventory_backend
-    restart: always
+  # ============================================================
+  # pgAdmin (optional, for development database management)
+  # ============================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: velozity_pgadmin
+    restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-inventory}
-      - LOW_STOCK_THRESHOLD=${LOW_STOCK_THRESHOLD:-10}
-      - PORT=8000
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@velozity.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-pgadmin_dev_pw}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - "8000:8000"
+      - '5050:80'
     depends_on:
       db:
         condition: service_healthy
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
-    container_name: inventory_frontend
-    restart: always
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+    networks:
+      - velozity_network
+    profiles:
+      - tools
 
 volumes:
   pgdata:
+    driver: local
+
+networks:
+  velozity_network:
+    driver: bridge
