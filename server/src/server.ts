@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { createApp } from './app';
@@ -13,15 +12,12 @@ async function bootstrap() {
     const app = createApp();
     const httpServer = http.createServer(app);
 
-    // Initialize Socket.io
+    // Initialize Socket.io with permissive CORS for cloud deployments
     const io = new SocketIOServer(httpServer, {
       cors: {
-        origin: [
-          env.CLIENT_URL,
-          'http://localhost:5173',
-          'http://localhost:3000',
-          'http://127.0.0.1:5173',
-        ],
+        origin: (origin, callback) => {
+          callback(null, true); // Allow any client connecting with valid JWT credentials
+        },
         credentials: true,
         methods: ['GET', 'POST'],
       },
@@ -36,12 +32,11 @@ async function bootstrap() {
     // Start background scheduled jobs (overdue task checker)
     startBackgroundJobs();
 
-    // Start HTTP & WebSocket Server
+    // Start HTTP & WebSocket Server - bound to 0.0.0.0 for Docker & Railway
     const port = env.PORT || 5000;
-
-    httpServer.listen(port, () => {
+    httpServer.listen(port, '0.0.0.0', () => {
       logger.info(`=======================================================`);
-      logger.info(`🚀 Velozity ProjectHub Server running on port ${port}`);
+      logger.info(`🚀 Velozity ProjectHub Server running on http://0.0.0.0:${port}`);
       logger.info(`📡 Environment: ${env.NODE_ENV}`);
       logger.info(`🔌 WebSocket Server initialized`);
       logger.info(`⏰ Background jobs active`);
@@ -50,10 +45,7 @@ async function bootstrap() {
 
     // Graceful Shutdown
     const shutdown = async (signal: string) => {
-      logger.info(
-        `${signal} received: closing HTTP and WebSocket server...`
-      );
-
+      logger.info(`${signal} received: closing HTTP and WebSocket server...`);
       httpServer.close(async () => {
         logger.info('HTTP server closed.');
         await prisma.$disconnect();
@@ -63,9 +55,7 @@ async function bootstrap() {
 
       // Force shutdown after 10s if graceful fails
       setTimeout(() => {
-        logger.error(
-          'Could not close connections in time, forcefully shutting down'
-        );
+        logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
       }, 10000);
     };
