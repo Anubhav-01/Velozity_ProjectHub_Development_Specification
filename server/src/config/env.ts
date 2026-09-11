@@ -6,12 +6,18 @@ dotenv.config();
 
 const isTest = process.env.NODE_ENV === 'test';
 
-// Railway / Render / Supabase / Neon connection URL resolution
+// Railway / Render / Supabase / Neon connection URL resolution with safe fallback
 const resolvedDatabaseUrl =
   process.env.DATABASE_URL ||
   process.env.POSTGRES_URL ||
   process.env.DATABASE_PUBLIC_URL ||
-  (isTest ? 'postgresql://postgres:postgres@localhost:5432/velozity_test' : '');
+  (isTest
+    ? 'postgresql://postgres:postgres@localhost:5432/velozity_test'
+    : 'postgresql://postgres:postgres@localhost:5432/velozity_projecthub');
+
+if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL && !process.env.DATABASE_PUBLIC_URL && !isTest) {
+  console.warn('⚠️  DATABASE_URL environment variable is not set. Please add a PostgreSQL database in Railway.');
+}
 
 // Safe JWT secret resolution with automatic secure generation if missing in production/preview
 let accessSecret = process.env.JWT_ACCESS_SECRET;
@@ -38,8 +44,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(5000),
 
-  // Database
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required. Set it in Railway/hosting environment variables.'),
+  // Database URL with fallback so container doesn't fail before DB attachment
+  DATABASE_URL: z.string().default(resolvedDatabaseUrl),
 
   // JWT
   JWT_ACCESS_SECRET: z.string().min(32),

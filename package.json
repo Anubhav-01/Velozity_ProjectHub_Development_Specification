@@ -11,7 +11,7 @@
     "build": "npm run build:server && npm run build:client",
     "build:server": "npm run build --workspace=server",
     "build:client": "npm run build --workspace=client",
-    "start": "node server/dist/server.js",
+    "start": "node scripts/start-production.js",
     "start:prod": "npx prisma db push --schema=prisma/schema.prisma && node server/dist/server.js",
     "test": "npm run test --workspace=server",
     "seed": "npm run seed --workspace=server",
