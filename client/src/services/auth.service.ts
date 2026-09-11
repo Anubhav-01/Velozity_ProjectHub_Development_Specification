@@ -2,6 +2,16 @@ import api from './api';
 import { ApiResponse, User } from '../types';
 
 export const authService = {
+  async register(data: {
+    name: string;
+    email: string;
+    password: string;
+    role?: string;
+  }): Promise<{ user: User; accessToken: string }> {
+    const res = await api.post<ApiResponse<{ user: User; accessToken: string }>>('/auth/register', data);
+    return res.data.data;
+  },
+
   async login(email: string, password: string): Promise<{ user: User; accessToken: string }> {
     const res = await api.post<ApiResponse<{ user: User; accessToken: string }>>('/auth/login', {
       email,

@@ -3,6 +3,16 @@ import { authService } from '../services/auth.service';
 import { sendSuccess } from '../utils/response';
 
 export const authController = {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { name, email, password, role } = req.body;
+      const result = await authService.register({ name, email, password, role }, res);
+      sendSuccess(res, result, 201);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { email, password } = req.body;

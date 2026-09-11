@@ -1,7 +1,8 @@
 import { Response } from 'express';
 import { userRepository } from '../repositories/user.repository';
 import { refreshTokenRepository } from '../repositories/refreshToken.repository';
-import { comparePassword } from '../utils/password';
+import { comparePassword, hashPassword } from '../utils/password';
+import { Role } from '@prisma/client';
 import {
   signAccessToken,
   signRefreshToken,
@@ -23,6 +24,49 @@ function generateTokenId(): string {
 const COOKIE_NAME = 'velozity_refresh_token';
 
 export const authService = {
+  async register(
+    data: { name: string; email: string; password: string; role?: Role },
+    res: Response
+  ) {
+    const existing = await userRepository.findByEmail(data.email);
+    if (existing) {
+      throw ApiError.conflict('A user with this email address already exists');
+    }
+
+    const passwordHash = await hashPassword(data.password);
+    const user = await userRepository.create({
+      name: data.name,
+      email: data.email,
+      passwordHash,
+      role: data.role || Role.DEVELOPER,
+    });
+
+    const accessToken = signAccessToken(user.id, user.role);
+    const tokenId = generateTokenId();
+    const refreshToken = signRefreshToken(user.id, tokenId);
+    const expiresAt = getRefreshTokenExpiryDate();
+
+    await refreshTokenRepository.create({
+      userId: user.id,
+      token: refreshToken,
+      expiresAt,
+    });
+
+    authService.setRefreshTokenCookie(res, refreshToken);
+
+    logger.info({ message: 'User registered', userId: user.id, email: user.email });
+
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  },
+
   async login(email: string, password: string, res: Response) {
     // 1. Find user
     const user = await userRepository.findByEmail(email);

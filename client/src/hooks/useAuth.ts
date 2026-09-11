@@ -19,6 +19,16 @@ export function useAuth() {
     },
   });
 
+  const registerMutation = useMutation({
+    mutationFn: (data: { name: string; email: string; password: string; role?: string }) =>
+      authService.register(data),
+    onSuccess: (data) => {
+      setAuth(data.user, data.accessToken);
+      queryClient.clear();
+      navigate('/dashboard');
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: () => authService.logout(),
     onSettled: () => {
@@ -37,6 +47,9 @@ export function useAuth() {
     login: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
+    register: registerMutation.mutateAsync,
+    isRegistering: registerMutation.isPending,
+    registerError: registerMutation.error,
     logout: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,
   };
